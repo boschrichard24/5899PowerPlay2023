@@ -11,22 +11,23 @@ apply plugin: "maven-publish"
 apply plugin: "checkstyle"
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 23
         //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 26
+        targetSdkVersion 33
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
-    lintOptions {
+    lint {
         abortOnError false
     }
+    namespace 'com.acmerobotics.dashboard'
+
 }
 
 node {
@@ -100,12 +101,12 @@ dependencies {
         transitive = false
     }
 
-    api "org.firstinspires.ftc:RobotCore:$min_sdk_version"
-    api "org.firstinspires.ftc:Hardware:$min_sdk_version"
-    api "org.firstinspires.ftc:RobotServer:$min_sdk_version"
-    api "org.firstinspires.ftc:FtcCommon:$min_sdk_version"
+    api "org.firstinspires.ftc:RobotCore:8.1.1"
+    api "org.firstinspires.ftc:Hardware:8.1.1"
+    api "org.firstinspires.ftc:RobotServer:8.1.1"
+    api "org.firstinspires.ftc:FtcCommon:8.1.1"
 
-    implementation "androidx.annotation:annotation:1.1.0"
+    implementation "androidx.annotation:annotation:1.5.0"
 
     implementation("org.nanohttpd:nanohttpd-websocket:2.3.1") {
         exclude module: "nanohttpd"

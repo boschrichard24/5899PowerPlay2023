@@ -222,8 +222,6 @@ public class FtcDashboard implements OpModeManagerImpl.Notifications {
                     }
                 } catch (InterruptedException e) {
                     break;
-                } catch (RobotCoreException e) {
-                    throw new RuntimeException(e);
                 }
             }
         }
