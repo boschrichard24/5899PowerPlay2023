@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -9,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -17,9 +18,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@TeleOp(name="UltimateTeleOp", group="TeleOp")
+@TeleOp(name="LuckyTeleOp", group="TeleOp")
 //@Disabled
-public class UltimateTeleOp extends LinearOpMode {
+public class LuckyTeleOp extends LinearOpMode{
+
     protected DcMotor motorFwdLeft = null;
     protected DcMotor motorFwdRight = null;
     protected DcMotor motorBackLeft = null;
@@ -36,8 +38,8 @@ public class UltimateTeleOp extends LinearOpMode {
     private DistanceSensor coneProx;
     private ColorSensor colorBoi;
 
-    private TouchSensor limitLeft;
-    private TouchSensor limitRight;
+    private DigitalChannel limitLeft;
+    private DigitalChannel limitRight;
 
 
     private final ElapsedTime runtime = new ElapsedTime();
@@ -63,6 +65,12 @@ public class UltimateTeleOp extends LinearOpMode {
     double closeServoMeric = 0.05;
     double openServoMeric = 0.5;
     boolean servoModeMeric = false;
+
+    double color1 = 0;
+    double blue = 0;
+    double green = 0;
+    double red = 0;
+    double servoPos = .5;
 
 
     /*This function determines the number of ticks a motor
@@ -116,8 +124,8 @@ public class UltimateTeleOp extends LinearOpMode {
 
         coneProx = hardwareMap.get(DistanceSensor.class, "coneProx");
         colorBoi = hardwareMap.get(ColorSensor.class, "colorBoi");
-        limitLeft = hardwareMap.get(TouchSensor.class, "limitLeft");
-        limitRight = hardwareMap.get(TouchSensor.class, "limitRight");
+        limitLeft = hardwareMap.get(DigitalChannel.class, "limitLeft");
+        limitRight = hardwareMap.get(DigitalChannel.class, "limitRight");
 
 
         motorFwdRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -143,13 +151,6 @@ public class UltimateTeleOp extends LinearOpMode {
 
     }
 
-    double color1 = 0;
-    double blue = 0;
-    double green = 0;
-    double red = 0;
-    double servoPos = .5;
-
-
     @Override
     public void runOpMode() {
 
@@ -162,13 +163,12 @@ public class UltimateTeleOp extends LinearOpMode {
         boolean changed7 = false;
         boolean changed8 = false;
 
-        intakeServo.setPosition(lockServoPos);
+            intakeServo.setPosition(lockServoPos);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-
-        // run until the end of the match (driver presses STOP)
+// run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
             //movement controls
@@ -212,11 +212,6 @@ public class UltimateTeleOp extends LinearOpMode {
             liftLeft.setPower(liftPower);
             liftRight.setPower(liftPower);
 
-            //collects input for shooter, and intake motors
-            double intake = this.gamepad1.right_trigger - this.gamepad1.left_trigger;
-            double shoot = this.gamepad2.right_trigger - this.gamepad2.left_trigger;
-
-
 // ### INTAKE SERVO CODE ### \\
 
             // Open mechanism when pressing button
@@ -234,109 +229,44 @@ public class UltimateTeleOp extends LinearOpMode {
                     intakeServo.setPosition(lockServoPos);
                 }
             }
-
-// If the Magnetic Limit Swtch is pressed, stop the motor
-            if (limitLeft.isPressed() || limitRight.isPressed()) {
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_LAVA_PALETTE);
-            } else { // Otherwise, run the motor
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_RAINBOW_PALETTE);
-            }
-
-
-            if(liftLeft.getCurrentPosition() > 2800 || liftRight.getCurrentPosition() > 2800){
-                powerLim = 0.25;
-            }
-            else if(liftLeft.getCurrentPosition() > 1650 || liftRight.getCurrentPosition() > 1650){
-                powerLim = .5;
-            } else{
-                powerLim = .75;
-            }
-
-/*
-
-            if(angles.thirdAngle <= 68 && angles.thirdAngle>40){
-                while(angles.thirdAngle < 80) {
-                    angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.YZX, AngleUnit.DEGREES);
-                    if(gamepad1.dpad_up && !changed8){
-                        telemetry.addData("GO FORWARD BOIIIIII", changed8);
-                        resetAngle();
-                    } else if(!gamepad1.dpad_up){changed8 = false;}
-                    motorBackLeft.setPower(0);
-                    motorBackRight.setPower(0);
-                    motorBackLeft.setPower(-0.55);
-                    motorBackRight.setPower(-0.55);
-                }
-            }
-
-            if(angles.thirdAngle >= 115 && angles.thirdAngle>40){
-                while(angles.thirdAngle > 95) {
-                    angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.YZX, AngleUnit.DEGREES);
-                    if(gamepad1.dpad_up && !changed8){
-                        telemetry.addData("GO BACK BOIIIIII", changed8);
-                        resetAngle();
-                    } else if(!gamepad1.dpad_up){changed8 = false;}
-                    motorBackLeft.setPower(0);
-                    motorBackRight.setPower(0);
-                    motorFwdLeft.setPower(0.55);
-                    motorFwdRight.setPower(0.55);
-                }
-            }
-*/
-
-
-            //toggles for the two side arms
-            /*
-            if(gamepad2.x && !changed1) {//toggles the claw near to slides
-                if(claw1Pos == .186){
-                    claw1Pos = .789;
-                    claw1.setPosition(claw1Pos);
-                }
-                else{
-                    claw1Pos = .186;
-                    claw1.setPosition(claw1Pos);
-                }
-                changed1 = true;
-            } else if(!gamepad2.x){changed1 = false;}
-            */
-
-
+// ### SPPED CHANGE STUFFINS ### \\
+            //toggle for speed and direction of the bot for easier control
             if(gamepad1.b && !changed3) {//speed limiter toggle
                 if(powerLim == .5){
                     powerLim = 0.75;
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
-
+                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
                 }
                 else{
                     powerLim = .5;
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE);
+                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
 
                 }
                 changed3 = true;
             } else if(!gamepad1.b){changed3 = false;}
 
-            if(gamepad1.x && !changed7) { //CHEETAH toggle
-                if(powerLim == 0.75){
+            if(gamepad1.y && !changed7) {//direction change toggle
+                if(powerLim == 1){
+                    powerLim = 0.75;
+                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+
+                }
+                else{
                     powerLim = 1;
                     lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
 
                 }
-                else{
-                    powerLim = 0.75;
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE);
-
-                }
                 changed7 = true;
-            } else if(!gamepad1.x){changed7 = false;}
+            } else if(!gamepad1.a){changed7 = false;}
 
             if(gamepad1.a && !changed4) { //direction change toggle
                 if(moveDir == 1){
                     moveDir = -1;
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.TWINKLES_PARTY_PALETTE);
+                    //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.TWINKLES_PARTY_PALETTE);
 
                 }
                 else{
                     moveDir = 1;
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
+                    //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
                 }
                 changed4 = true;
             } else if(!gamepad1.a){changed4 = false;}
@@ -355,6 +285,24 @@ public class UltimateTeleOp extends LinearOpMode {
                 }
                 changed6 = true;
             } else if(!gamepad2.b){changed6 = false;}
+
+            // If the Magnetic Limit Swtch is pressed, stop the motor
+            if (limitLeft.getState() || limitRight.getState()) {
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_2_COLOR_GRADIENT);
+            } else { // Otherwise, run the motor
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_LIGHT_CHASE);
+            }
+
+
+            if(liftLeft.getCurrentPosition() > 2800 || liftRight.getCurrentPosition() > 2800){
+                powerLim = 0.25;
+            }
+            else if(liftLeft.getCurrentPosition() > 1650 || liftRight.getCurrentPosition() > 1650){
+                powerLim = .5;
+            } else{
+                powerLim = .75;
+            }
+
 
 
             color1 = colorBoi.alpha();
@@ -379,6 +327,10 @@ public class UltimateTeleOp extends LinearOpMode {
             telemetry.addData("Red", red);
             telemetry.addData("Green", green);
             telemetry.addData("Blue", blue);
+            telemetry.addData("changed3", changed3);
+            telemetry.addData("changed4", changed4);
+            telemetry.addData("changed7", changed7);
+
 
             telemetry.update();
         }
