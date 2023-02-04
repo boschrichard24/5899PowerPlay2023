@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.drive;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
@@ -28,18 +27,12 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityCons
 import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.AnalogSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.teamcode.util.AxesSigns;
@@ -57,7 +50,6 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_ACCEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_VEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.encoderTicksToInches;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
@@ -108,10 +100,10 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private LinkedList<Pose2d> poseHistory;
 
-    public DcMotorEx leftFront;
-    public DcMotorEx leftRear;
-    public DcMotorEx rightRear;
-    public DcMotorEx rightFront;
+    public DcMotorEx motorFwdLeft;
+    public DcMotorEx motorBackLeft;
+    public DcMotorEx motorFwdRight;
+    public DcMotorEx motorBackRight;
     private List<DcMotorEx> motors;
     private BNO055IMU imu;
 
@@ -163,12 +155,12 @@ public class SampleMecanumDrive extends MecanumDrive {
         // upward (normal to the floor) using a command like the following:
         BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "front_left");
-        leftRear = hardwareMap.get(DcMotorEx.class, "back_left");
-        rightRear = hardwareMap.get(DcMotorEx.class, "back_right");
-        rightFront = hardwareMap.get(DcMotorEx.class, "front_right");
+        motorFwdLeft = hardwareMap.get(DcMotorEx.class, "motorFwdLeft");
+        motorBackLeft = hardwareMap.get(DcMotorEx.class, "motorBackLeft");
+        motorFwdRight = hardwareMap.get(DcMotorEx.class, "motorFwdRight");
+        motorBackRight = hardwareMap.get(DcMotorEx.class, "motorBackRight");
 
-        motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
+        motors = Arrays.asList(motorFwdLeft, motorBackLeft, motorFwdRight, motorBackRight);
 
         for (DcMotorEx motor : motors) {
             MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
@@ -188,8 +180,8 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // TODO: reverse any motors using DcMotor.setDirection()
 
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        leftRear.setDirection(DcMotor.Direction.REVERSE);
+        motorFwdLeft.setDirection(DcMotor.Direction.REVERSE);
+        motorBackLeft.setDirection(DcMotor.Direction.REVERSE);
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
@@ -459,10 +451,10 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        leftFront.setPower(v);
-        leftRear.setPower(v1);
-        rightRear.setPower(v2);
-        rightFront.setPower(v3);
+        motorFwdLeft.setPower(v);
+        motorBackLeft.setPower(v1);
+        motorFwdRight.setPower(v2);
+        motorBackRight.setPower(v3);
     }
 
     @Override

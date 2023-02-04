@@ -53,26 +53,28 @@ public class CONERedLeft extends AutoSupplies {
 
 
         if (daWay == 3) {
+
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
 
-            encoderMove(1000, 1, 0);
+            encoderMove(360, 1, 0);
             pause(800);
-            encoderMove(1200, 0, 1);
+            encoderMove(822, 0, 0.6);
             pause(800);
-            turnToS(44,0.5,2);
+            turnToS(45,0.5,2);
             ArmUP();
             setArmEncoderMode();
             telemetry.addData("LEFT Arm Vals :: ", liftLeft.getCurrentPosition());
             telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
             telemetry.update();
             //pause(2000);
-            encoderMove(390, 0, 0.3);
+            encoderMove(245, 0, 0.3);
             pause(1000);
             Release();
             pause(500);
             telemetry.addData("DOWN TIME:: ", 67);
             telemetry.update();
             encoderMove(200, 0, -0.3);
+            Close();
             ArmDOWN();
             pause(2000);
             turnToS(-18,0.5,2);
@@ -83,9 +85,9 @@ public class CONERedLeft extends AutoSupplies {
         } else if (daWay == 2) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
 
-            encoderMove(200, -0.5, 0.5);
+            encoderMove(160, -0.35, 0.35);
             pause(800);
-            encoderMove(1000, 0, 1);
+            encoderMove(700, 0, 0.6);
             pause(800);
             turnToS(-44,0.5,2);
             ArmUP();
@@ -94,13 +96,14 @@ public class CONERedLeft extends AutoSupplies {
             telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
             telemetry.update();
             //pause(2000);
-            encoderMove(390, 0, 0.3);
+            encoderMove(160, 0, 0.3);
             pause(1000);
             Release();
             pause(500);
             telemetry.addData("DOWN TIME:: ", 67);
             telemetry.update();
             encoderMove(200, 0, -0.3);
+            Close();
             ArmDOWN();
             pause(2000);
             turnToS(20,0.5,2);
@@ -113,7 +116,7 @@ public class CONERedLeft extends AutoSupplies {
 
             encoderMove(200, -0.5, 0.5);
             pause(800);
-            encoderMove(1000, 0, 1);
+            encoderMove(700, 0, 1);
             pause(800);
             turnToS(-44,0.5,2);
             ArmUP();
@@ -122,12 +125,13 @@ public class CONERedLeft extends AutoSupplies {
             telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
             telemetry.update();
             //pause(2000);
-            encoderMove(390, 0, 0.3);
+            encoderMove(160, 0, 0.3);
             pause(1000);
             Release();
             pause(500);
             telemetry.addData("DOWN TIME:: ", 67);
             telemetry.update();
+            Close();
             encoderMove(200, 0, -0.3);
             ArmDOWN();
             pause(2000);
