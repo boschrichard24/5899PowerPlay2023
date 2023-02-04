@@ -127,6 +127,7 @@ public class LuckyTeleOp extends LinearOpMode{
         limitLeft = hardwareMap.get(DigitalChannel.class, "limitLeft");
         limitRight = hardwareMap.get(DigitalChannel.class, "limitRight");
 
+        resetArmEncoders();
 
         motorFwdRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -141,6 +142,7 @@ public class LuckyTeleOp extends LinearOpMode{
         parameters.loggingEnabled      = false;
 
 
+
         intakeServo = hardwareMap.get(Servo.class,"intakeServo");
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -153,6 +155,7 @@ public class LuckyTeleOp extends LinearOpMode{
 
     @Override
     public void runOpMode() {
+
 
         hardwareSetup();
 
@@ -170,6 +173,8 @@ public class LuckyTeleOp extends LinearOpMode{
 
 // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            liftLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            liftRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             //movement controls
             //collects input from the joysticks

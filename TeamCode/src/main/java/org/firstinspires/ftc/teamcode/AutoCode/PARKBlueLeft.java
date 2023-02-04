@@ -58,24 +58,35 @@ public class PARKBlueLeft extends AutoSupplies {
         sleep(300);
         if (daWay == 1) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-            encoderMove(710, -0.5, 0);
-            pause(1500);
-            encoderMove(775, 0, 0.8);
+            encoderMove(400, -1, 0);
+            pause(800);
+            encoderMove(625, 0, 0.6);
+
         } else if (daWay == 2) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-            encoderMove(200, -0.5, 0.5);
-            pause(1500);
-            encoderMove(740, 0, 1);
+            encoderMove(140, -0.35, 0.35);
+            pause(800);
+            turnToS(0,0.5,2);
+            pause(800);
+            encoderMove(700, 0, 0.85);
+            pause(800);
+
         } else if(daWay == 3){
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-            encoderMove(790, 0.5, 0);
-            pause(1500);
-            encoderMove(775, 0, 1);
+            encoderMove(356, 1, 0);
+            pause(800);
+            encoderMove(861, 0, 0.6);
+            pause(800);
+
         } else{
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-            encoderMove(200, -0.5, 0.5);
-            pause(1500);
-            encoderMove(725, 0, 0.8);
+            encoderMove(140, -0.35, 0.35);
+            pause(800);
+            turnToS(0,0.5,2);
+            pause(800);
+            encoderMove(700, 0, 0.85);
+            pause(800);
+
         }
 
         if(daWay == 0) {

@@ -249,9 +249,9 @@ public abstract class AutoSupplies extends LinearOpMode{
     {
         telemetry.addData("leftArm Encoder Val :: ",liftLeft.getCurrentPosition());
         telemetry.addData("rightArm Encoder Val :: ",liftRight.getCurrentPosition());
-        runArmPower(-0.8);
-        liftLeft.setTargetPosition(2989);
-        liftRight.setTargetPosition(2917);
+        runArmPower(-1);
+        liftLeft.setTargetPosition(2929);
+        liftRight.setTargetPosition(2838);
     }
 
     public void runArmPower(double power)

@@ -57,31 +57,32 @@ public class CONEBlueRight extends AutoSupplies {
         }
 
 
-        sleep(300);
+
         if (daWay == 1) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
 
-            encoderMove(1000, -1, 0);
+            encoderMove(470, -1, 0);
             pause(800);
-            encoderMove(1200, 0, 1);
+            encoderMove(861, 0, 0.6);
             pause(800);
-            turnToS(-44, 0.5, 2);
+            turnToS(-45,0.5,2);
             ArmUP();
             setArmEncoderMode();
             telemetry.addData("LEFT Arm Vals :: ", liftLeft.getCurrentPosition());
             telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
             telemetry.update();
             //pause(2000);
-            encoderMove(390, 0, 0.3);
+            encoderMove(245, 0, 0.3);
             pause(1000);
             Release();
             pause(500);
             telemetry.addData("DOWN TIME:: ", 67);
             telemetry.update();
             encoderMove(200, 0, -0.3);
+            Close();
             ArmDOWN();
             pause(2000);
-            turnToS(18, 0.5, 2);
+            turnToS(18,0.5,2);
             telemetry.addData("After break", 36);
             telemetry.update();
 
@@ -89,46 +90,51 @@ public class CONEBlueRight extends AutoSupplies {
         } else if (daWay == 2) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
 
-            encoderMove(200, -0.5, 0.5);
+            encoderMove(140, -0.35, 0.35);
             pause(800);
-            encoderMove(1000, 0, 1);
+            turnToS(0,0.5,2);
             pause(800);
-            turnToS(44, 0.5, 2);
+            encoderMove(700, 0, 0.85);
+            pause(800);
+            turnToS(44,0.5,2);
             ArmUP();
             setArmEncoderMode();
             telemetry.addData("LEFT Arm Vals :: ", liftLeft.getCurrentPosition());
             telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
             telemetry.update();
             //pause(2000);
-            encoderMove(390, 0, 0.3);
-            pause(1000);
+            encoderMove(160, 0, 0.3);
+            pause(500);
             Release();
             pause(500);
             telemetry.addData("DOWN TIME:: ", 67);
             telemetry.update();
-            encoderMove(200, 0, -0.3);
+            encoderMove(315, 0, -0.3);
+            Close();
             ArmDOWN();
             pause(2000);
-            turnToS(-20, 0.5, 2);
+            turnToS(-20,0.5,2);
             telemetry.addData("After break", 56);
             telemetry.update();
 
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
-        } else if (daWay == 3) {
+        } else if(daWay == 3){
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
 
-            encoderMove(200, -0.5, 0.5);
+            encoderMove(140, -0.35, 0.35);
             pause(800);
-            encoderMove(1000, 0, 1);
+            turnToS(0,0.5,2);
             pause(800);
-            turnToS(44, 0.5, 2);
+            encoderMove(700, 0, 0.85);
+            pause(800);
+            turnToS(44,0.5,2);
             ArmUP();
             setArmEncoderMode();
             telemetry.addData("LEFT Arm Vals :: ", liftLeft.getCurrentPosition());
             telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
             telemetry.update();
             //pause(2000);
-            encoderMove(390, 0, 0.3);
+            encoderMove(160, 0, 0.3);
             pause(1000);
             Release();
             pause(500);
@@ -137,21 +143,21 @@ public class CONEBlueRight extends AutoSupplies {
             encoderMove(200, 0, -0.3);
             ArmDOWN();
             pause(2000);
-            turnToS(-75, 0.5, 2);
+            turnToS(-75,0.5,2);
             pause(2000);
             encoderMove(650, 0, 1);
             telemetry.addData("After break", 86);
             telemetry.update();
 
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
-        } else {
+        } else{
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
 
             encoderMove(200, -0.5, 0.5);
             pause(800);
             encoderMove(1000, 0, 1);
             pause(800);
-            turnToS(44, 0.5, 2);
+            turnToS(44,0.5,2);
             ArmUP();
             setArmEncoderMode();
             telemetry.addData("LEFT Arm Vals :: ", liftLeft.getCurrentPosition());
@@ -167,7 +173,7 @@ public class CONEBlueRight extends AutoSupplies {
             encoderMove(200, 0, -0.3);
             ArmDOWN();
             pause(2000);
-            turnToS(-20, 0.5, 2);
+            turnToS(-20,0.5,2);
             telemetry.addData("After break", 678000);
             telemetry.update();
 
@@ -177,5 +183,6 @@ public class CONEBlueRight extends AutoSupplies {
         if(daWay != 0) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
         }
+
     }
 }

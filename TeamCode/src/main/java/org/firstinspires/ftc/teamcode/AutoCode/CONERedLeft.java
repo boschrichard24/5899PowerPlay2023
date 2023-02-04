@@ -56,38 +56,80 @@ public class CONERedLeft extends AutoSupplies {
 
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
 
-            encoderMove(360, 1, 0);
+            encoderMove(352, 1, 0);
             pause(800);
-            encoderMove(822, 0, 0.6);
+            encoderMove(872, 0, 0.6);
             pause(800);
-            turnToS(45,0.5,2);
+            turnToS(46,0.5,2);
             ArmUP();
             setArmEncoderMode();
             telemetry.addData("LEFT Arm Vals :: ", liftLeft.getCurrentPosition());
             telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
             telemetry.update();
             //pause(2000);
-            encoderMove(245, 0, 0.3);
+            encoderMove(175, 0, 0.3);
             pause(1000);
             Release();
-            pause(500);
+            pause(800);
             telemetry.addData("DOWN TIME:: ", 67);
             telemetry.update();
             encoderMove(200, 0, -0.3);
             Close();
             ArmDOWN();
             pause(2000);
-            turnToS(-18,0.5,2);
+            turnToS(86,0.5,3);
             telemetry.addData("After break", 36);
             telemetry.update();
 
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
         } else if (daWay == 2) {
+
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
 
-            encoderMove(160, -0.35, 0.35);
+
+            encoderMove(352, 1, 0);
             pause(800);
-            encoderMove(700, 0, 0.6);
+            encoderMove(872, 0, 0.6);
+            pause(800);
+            turnToS(46,0.5,2);
+            ArmUP();
+            setArmEncoderMode();
+            telemetry.addData("LEFT Arm Vals :: ", liftLeft.getCurrentPosition());
+            telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
+            telemetry.update();
+            //pause(2000);
+            encoderMove(175, 0, 0.3);
+            pause(1000);
+            Release();
+            pause(800);
+            telemetry.addData("DOWN TIME:: ", 67);
+            telemetry.update();
+            encoderMove(200, 0, -0.3);
+            Close();
+            ArmDOWN();
+            pause(2000);
+            turnToS(86,0.5,3);
+            pause(2000);
+            encoderMove(385, 0, 0.4);
+
+            telemetry.addData("After break", 36);
+            telemetry.update();
+
+
+
+
+            /*
+            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+
+            encoderMove(154, -0.35, 0.35);
+            pause(800);
+            turnToS(0,0.5,2);
+            pause(800);
+            encoderMove(425, 0, 0.85);
+            pause(800);
+            turnToS(-360,1,2);
+            pause(800);
+            encoderMove(325, 0, 0.85);
             pause(800);
             turnToS(-44,0.5,2);
             ArmUP();
@@ -96,7 +138,7 @@ public class CONERedLeft extends AutoSupplies {
             telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
             telemetry.update();
             //pause(2000);
-            encoderMove(160, 0, 0.3);
+            encoderMove(215, 0, 0.3);
             pause(1000);
             Release();
             pause(500);
@@ -110,13 +152,77 @@ public class CONERedLeft extends AutoSupplies {
             telemetry.addData("After break", 56);
             telemetry.update();
 
+             */
+
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
         } else if(daWay == 1){
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
 
-            encoderMove(200, -0.5, 0.5);
+            encoderMove(352, 1, 0);
             pause(800);
-            encoderMove(700, 0, 1);
+            encoderMove(872, 0, 0.6);
+            pause(800);
+            turnToS(46,0.5,2);
+            ArmUP();
+            setArmEncoderMode();
+            telemetry.addData("LEFT Arm Vals :: ", liftLeft.getCurrentPosition());
+            telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
+            telemetry.update();
+            //pause(2000);
+            encoderMove(175, 0, 0.3);
+            pause(1000);
+            Release();
+            pause(800);
+            telemetry.addData("DOWN TIME:: ", 67);
+            telemetry.update();
+            encoderMove(200, 0, -0.3);
+            Close();
+            ArmDOWN();
+            pause(2000);
+            turnToS(86,0.5,3);
+            pause(2000);
+            encoderMove(385, 0, 0.4);
+            pause(1000);
+            turnToS(90,0.5,3);
+            pause(800);
+            encoderMove(421, 0, 0.4);
+            pause(800);
+            telemetry.addData("After break", 36);
+            telemetry.update();
+
+            /*
+            encoderMove(352, 1, 0);
+            pause(800);
+            encoderMove(868, 0, 0.6);
+            pause(800);
+            turnToS(43,0.5,2);
+            ArmUP();
+            setArmEncoderMode();
+            telemetry.addData("LEFT Arm Vals :: ", liftLeft.getCurrentPosition());
+            telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
+            telemetry.update();
+            //pause(2000);
+            encoderMove(194, 0, 0.3);
+            pause(1000);
+            Release();
+            pause(500);
+            telemetry.addData("DOWN TIME:: ", 67);
+            telemetry.update();
+            encoderMove(200, 0, -0.3);
+            Close();
+            ArmDOWN();
+            pause(2000);
+            turnToS(80,0.5,2);
+            pause(2000);
+            encoderMove(400, 0, 0.4);
+
+            telemetry.addData("After break", 36);
+            telemetry.update();
+
+            /*
+            encoderMove(154, -0.35, 0.35);
+            pause(800);
+            encoderMove(735, 0, 0.6);
             pause(800);
             turnToS(-44,0.5,2);
             ArmUP();
@@ -125,7 +231,7 @@ public class CONERedLeft extends AutoSupplies {
             telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
             telemetry.update();
             //pause(2000);
-            encoderMove(160, 0, 0.3);
+            encoderMove(193, 0, 0.3);
             pause(1000);
             Release();
             pause(500);
@@ -135,38 +241,42 @@ public class CONERedLeft extends AutoSupplies {
             encoderMove(200, 0, -0.3);
             ArmDOWN();
             pause(2000);
-            turnToS(75,0.5,2);
+            turnToS(160,0.5,2);
             pause(2000);
             encoderMove(650, 0, 1);
             telemetry.addData("After break", 86);
             telemetry.update();
-
+*/
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
         } else{
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
 
-            encoderMove(200, -0.5, 0.5);
+            encoderMove(352, 1, 0);
             pause(800);
-            encoderMove(1000, 0, 1);
+            encoderMove(868, 0, 0.6);
             pause(800);
-            turnToS(-44,0.5,2);
+            turnToS(46,0.5,2);
             ArmUP();
             setArmEncoderMode();
             telemetry.addData("LEFT Arm Vals :: ", liftLeft.getCurrentPosition());
             telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
             telemetry.update();
             //pause(2000);
-            encoderMove(390, 0, 0.3);
+            encoderMove(185, 0, 0.3);
             pause(1000);
             Release();
-            pause(500);
-            telemetry.addData("DOWN TIME:: ", 678000);
+            pause(800);
+            telemetry.addData("DOWN TIME:: ", 67);
             telemetry.update();
             encoderMove(200, 0, -0.3);
+            Close();
             ArmDOWN();
             pause(2000);
-            turnToS(20,0.5,2);
-            telemetry.addData("After break", 678000);
+            turnToS(85,0.5,2);
+            pause(2000);
+            encoderMove(750, 0, 0.4);
+
+            telemetry.addData("After break", 36);
             telemetry.update();
 
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.LIGHT_CHASE_RED);
