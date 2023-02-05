@@ -253,7 +253,7 @@ public class CONERedLeft extends AutoSupplies {
 
             encoderMove(352, 1, 0);
             pause(800);
-            encoderMove(868, 0, 0.6);
+            encoderMove(872, 0, 0.6);
             pause(800);
             turnToS(46,0.5,2);
             ArmUP();
@@ -262,7 +262,7 @@ public class CONERedLeft extends AutoSupplies {
             telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
             telemetry.update();
             //pause(2000);
-            encoderMove(185, 0, 0.3);
+            encoderMove(175, 0, 0.3);
             pause(1000);
             Release();
             pause(800);
@@ -272,12 +272,10 @@ public class CONERedLeft extends AutoSupplies {
             Close();
             ArmDOWN();
             pause(2000);
-            turnToS(85,0.5,2);
-            pause(2000);
-            encoderMove(750, 0, 0.4);
-
+            turnToS(86,0.5,3);
             telemetry.addData("After break", 36);
             telemetry.update();
+
 
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.LIGHT_CHASE_RED);
         }

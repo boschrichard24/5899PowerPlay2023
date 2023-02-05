@@ -80,12 +80,30 @@ public class PARKBlueLeft extends AutoSupplies {
 
         } else{
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-            encoderMove(140, -0.35, 0.35);
+            encoderMove(352, 1, 0);
             pause(800);
-            turnToS(0,0.5,2);
+            encoderMove(872, 0, 0.6);
             pause(800);
-            encoderMove(700, 0, 0.85);
+            turnToS(46,0.5,2);
+            ArmUP();
+            setArmEncoderMode();
+            telemetry.addData("LEFT Arm Vals :: ", liftLeft.getCurrentPosition());
+            telemetry.addData("RIGHT Arm Vals :: ", liftRight.getCurrentPosition());
+            telemetry.update();
+            //pause(2000);
+            encoderMove(175, 0, 0.3);
+            pause(1000);
+            Release();
             pause(800);
+            telemetry.addData("DOWN TIME:: ", 67);
+            telemetry.update();
+            encoderMove(200, 0, -0.3);
+            Close();
+            ArmDOWN();
+            pause(2000);
+            turnToS(86,0.5,3);
+            telemetry.addData("After break", 36);
+            telemetry.update();
 
         }
 
