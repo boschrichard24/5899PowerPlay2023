@@ -76,7 +76,7 @@ public class LuckyTeleOp extends LinearOpMode{
     /*This function determines the number of ticks a motor
     would need to move in order to achieve a certain degree*/
     private int getCountsPerDegree(double degrees, int motorNumber){
-        int ans = 0;
+        int ans;
         if(motorNumber == 1){
             ans = (int)(degrees * COUNTS_PER_DEGREE1);
         }
@@ -166,7 +166,7 @@ public class LuckyTeleOp extends LinearOpMode{
         boolean changed7 = false;
         boolean changed8 = false;
 
-            intakeServo.setPosition(lockServoPos);
+        intakeServo.setPosition(lockServoPos);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -219,8 +219,17 @@ public class LuckyTeleOp extends LinearOpMode{
 
 // ### INTAKE SERVO CODE ### \\
 
+            // Servo mechanism toggle from Caed's design to Meric's
+            if (gamepad2.left_bumper && !changed8) {
+                changed8 = true;
+                servoModeMeric = !servoModeMeric;
+            } else if (!gamepad2.left_bumper) {
+                changed8 = false;
+            }
+            telemetry.addData("Meric mode", servoModeMeric);
+
             // Open mechanism when pressing button
-            // Use different servo values for Meric's claw design
+            // Use different servo values for Meric's intake design
             if (gamepad2.y) {
                 if (servoModeMeric) {
                     intakeServo.setPosition(closeServoMeric);
@@ -234,9 +243,12 @@ public class LuckyTeleOp extends LinearOpMode{
                     intakeServo.setPosition(lockServoPos);
                 }
             }
-// ### SPPED CHANGE STUFFINS ### \\
-            //toggle for speed and direction of the bot for easier control
-            if(gamepad1.b && !changed3) {//speed limiter toggle
+
+
+// ### SPEED CHANGE STUFFINGS ### \\
+
+            // Speed change toggle
+            if(gamepad1.b && !changed3) {
                 if(powerLim == .5){
                     powerLim = 0.75;
                     lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
@@ -244,44 +256,24 @@ public class LuckyTeleOp extends LinearOpMode{
                 else{
                     powerLim = .5;
                     lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-
                 }
                 changed3 = true;
             } else if(!gamepad1.b){changed3 = false;}
 
-            if(gamepad1.y && !changed7) {//direction change toggle
-                if(powerLim == 1){
-                    powerLim = 0.75;
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-
-                }
-                else{
-                    powerLim = 1;
+            // Direction change toggle
+            if(gamepad1.a && !changed4) {
+                moveDir *= -1;
+                if (moveDir < 0) {
                     lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
-
-                }
-                changed7 = true;
-            } else if(!gamepad1.a){changed7 = false;}
-
-            if(gamepad1.a && !changed4) { //direction change toggle
-                if(moveDir == 1){
-                    moveDir = -1;
-                    //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.TWINKLES_PARTY_PALETTE);
-
-                }
-                else{
-                    moveDir = 1;
-                    //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
                 }
                 changed4 = true;
             } else if(!gamepad1.a){changed4 = false;}
 
 
+            // ### LIFT CONTROLS ### \\
 
-
-            //LIFTTTTT
-
-            if(gamepad2.b && !changed6) {//speed limiter toggle
+            //speed limiter toggle
+            if(gamepad2.b && !changed6) {
                 if(armPowerLim == .5){
                     armPowerLim = 1;
                 }
