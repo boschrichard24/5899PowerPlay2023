@@ -50,14 +50,13 @@ public class LuckyTeleOp extends LinearOpMode{
     private static final double DRIVE_GEAR_REDUCTION1 = .5; // This is < 1.0 if geared UP
     private static final double COUNTS_PER_DEGREE1 = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION1) / 360;
 
-    //Variables
+    // Movement variables
     private double max = 1.0;
     double maxPower;
     double powerLim = 0.75;
     double moveDir = 1;
     double armPowerLim = 1;
     Orientation angles;
-
 
     // Servo values \\
     double lockServoPos = 0.0;
@@ -70,8 +69,6 @@ public class LuckyTeleOp extends LinearOpMode{
     double blue = 0;
     double green = 0;
     double red = 0;
-    double servoPos = .5;
-
 
     /*This function determines the number of ticks a motor
     would need to move in order to achieve a certain degree*/
@@ -86,22 +83,7 @@ public class LuckyTeleOp extends LinearOpMode{
         return ans;
     }
 
-    /**
-     * Resets the cumulative angle tracking to zero.
-     */
-    private void resetAngle()
-    {
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-
-        parameters.mode                = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.loggingEnabled      = false;
-        imu.initialize(parameters);
-    }
-
-
-    public void resetArmEncoders()
+    public void resetLiftEncoders()
     {
         liftLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -110,7 +92,7 @@ public class LuckyTeleOp extends LinearOpMode{
 
     public void hardwareSetup()
     {
-        //Prepares all the hardware
+        // Prepares all the hardware
         motorFwdRight = hardwareMap.get(DcMotor.class, "motorFwdRight");
         motorBackLeft = hardwareMap.get(DcMotor.class, "motorBackLeft");
         motorFwdLeft = hardwareMap.get(DcMotor.class, "motorFwdLeft");
@@ -122,26 +104,26 @@ public class LuckyTeleOp extends LinearOpMode{
         liftRight = hardwareMap.get(DcMotor.class, "liftRight");
         liftRight.setDirection(DcMotor.Direction.FORWARD);
 
+        // Sensors on face of robot beneath intake
         coneProx = hardwareMap.get(DistanceSensor.class, "coneProx");
         colorBoi = hardwareMap.get(ColorSensor.class, "colorBoi");
         limitLeft = hardwareMap.get(DigitalChannel.class, "limitLeft");
         limitRight = hardwareMap.get(DigitalChannel.class, "limitRight");
 
-        resetArmEncoders();
+        resetLiftEncoders();
 
         motorFwdRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorFwdLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        // Gyroscope
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
         parameters.mode                = BNO055IMU.SensorMode.IMU;
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.loggingEnabled      = false;
-
-
 
         intakeServo = hardwareMap.get(Servo.class,"intakeServo");
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
@@ -156,14 +138,12 @@ public class LuckyTeleOp extends LinearOpMode{
     @Override
     public void runOpMode() {
 
-
         hardwareSetup();
 
-        //variables
+        // Variables
         boolean changed3 = false;
         boolean changed4 = false;
         boolean changed6 = false;
-        boolean changed7 = false;
         boolean changed8 = false;
 
         intakeServo.setPosition(lockServoPos);
@@ -171,7 +151,7 @@ public class LuckyTeleOp extends LinearOpMode{
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-// run until the end of the match (driver presses STOP)
+        // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             liftLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             liftRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -217,7 +197,7 @@ public class LuckyTeleOp extends LinearOpMode{
             liftLeft.setPower(liftPower);
             liftRight.setPower(liftPower);
 
-// ### INTAKE SERVO CODE ### \\
+            // ### INTAKE SERVO CODE ### \\
 
             // Servo mechanism toggle from Caed's design to Meric's
             if (gamepad2.left_bumper && !changed8) {
@@ -245,7 +225,7 @@ public class LuckyTeleOp extends LinearOpMode{
             }
 
 
-// ### SPEED CHANGE STUFFINGS ### \\
+            // ### SPEED CHANGE STUFFINGS ### \\
 
             // Speed change toggle
             if(gamepad1.b && !changed3) {
@@ -283,14 +263,14 @@ public class LuckyTeleOp extends LinearOpMode{
                 changed6 = true;
             } else if(!gamepad2.b){changed6 = false;}
 
-            // If the Magnetic Limit Swtch is pressed, stop the motor
+            // If the Magnetic Limit Switch is pressed, stop the motor
             if (limitLeft.getState() || limitRight.getState()) {
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_2_COLOR_GRADIENT);
             } else { // Otherwise, run the motor
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_LIGHT_CHASE);
             }
 
-
+            // This limits the distance the lift can travel
             if(liftLeft.getCurrentPosition() > 2800 || liftRight.getCurrentPosition() > 2800){
                 powerLim = 0.25;
             }
@@ -301,12 +281,15 @@ public class LuckyTeleOp extends LinearOpMode{
             }
 
 
+            // ### COLOR STUFF ### \\
 
             color1 = colorBoi.alpha();
             red = colorBoi.red();
             green = colorBoi.green();
             blue = colorBoi.blue();
 
+
+            // ### TELEMETRY STUFF (wait really?!) ### \\
 
             telemetry.addData("Wheel Position", motorFwdLeft.getCurrentPosition()); //to be used when the encoders are ready
             telemetry.addData("Max Speed",powerLim);
@@ -324,10 +307,6 @@ public class LuckyTeleOp extends LinearOpMode{
             telemetry.addData("Red", red);
             telemetry.addData("Green", green);
             telemetry.addData("Blue", blue);
-            telemetry.addData("changed3", changed3);
-            telemetry.addData("changed4", changed4);
-            telemetry.addData("changed7", changed7);
-
 
             telemetry.update();
         }
