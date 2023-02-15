@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -46,12 +48,10 @@ public class LuckyTeleOp extends LinearOpMode{
 
     //Encoder Values
     // Neverest 40 motor spec: quadrature encoder, 280 pulses per revolution, count = 280 *4
-    private static final double COUNTS_PER_MOTOR_REV = 1120; // Neverest 40 motor encoder All drive motor gearings
+    private static final double COUNTS_PER_MOTOR_REV = 1120; // Neverest 40 motor encoder All drive motor gearing's
     private static final double DRIVE_GEAR_REDUCTION1 = .5; // This is < 1.0 if geared UP
     private static final double COUNTS_PER_DEGREE1 = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION1) / 360;
 
-    // Movement variables
-    private double max = 1.0;
     double maxPower;
     double powerLim = 0.75;
     double moveDir = 1;
@@ -64,6 +64,8 @@ public class LuckyTeleOp extends LinearOpMode{
     double closeServoMeric = 0.05;
     double openServoMeric = 0.5;
     boolean servoModeMeric = false;
+    boolean servoOpen = false;  // Only used with Meric's intake (toggle controls)
+    double toggleCounter = 0.0;
 
     double color1 = 0;
     double blue = 0;
@@ -135,18 +137,26 @@ public class LuckyTeleOp extends LinearOpMode{
 
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public void runOpMode() {
 
         hardwareSetup();
 
         // Variables
+        boolean changed1 = false;
+        boolean changed2 = false;
         boolean changed3 = false;
         boolean changed4 = false;
-        boolean changed6 = false;
-        boolean changed8 = false;
 
-        intakeServo.setPosition(lockServoPos);
+        // Starting pos
+        if (servoModeMeric) {
+            intakeServo.setPosition(openServoMeric);
+            servoOpen = true;
+        } else {
+            intakeServo.setPosition(lockServoPos);
+            servoOpen = false;
+        }
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -186,39 +196,56 @@ public class LuckyTeleOp extends LinearOpMode{
                 rightFrontPower = rightFrontPower / maxPower;
                 leftBackPower = leftBackPower / maxPower;
                 rightBackPower = rightBackPower / maxPower;
-
             }
-            //sets the power of the motors
-            motorFwdLeft.setPower(leftFrontPower*max);
-            motorFwdRight.setPower(rightFrontPower*max);
-            motorBackLeft.setPower(leftBackPower*max);
-            motorBackRight.setPower(rightBackPower*max);
+
+            // Setting movement for lift and drive motors
+            double max = 1.0;
+            motorFwdLeft.setPower(leftFrontPower* max);
+            motorFwdRight.setPower(rightFrontPower* max);
+            motorBackLeft.setPower(leftBackPower* max);
+            motorBackRight.setPower(rightBackPower* max);
 
             liftLeft.setPower(liftPower);
             liftRight.setPower(liftPower);
 
+
             // ### INTAKE SERVO CODE ### \\
 
-            // Servo mechanism toggle from Caed's design to Meric's
-            if (gamepad2.left_bumper && !changed8) {
-                changed8 = true;
-                servoModeMeric = !servoModeMeric;
-            } else if (!gamepad2.left_bumper) {
-                changed8 = false;
-            }
-            telemetry.addData("Meric mode", servoModeMeric);
-
-            // Open mechanism when pressing button
-            // Use different servo values for Meric's intake design
-            if (gamepad2.y) {
-                if (servoModeMeric) {
-                    intakeServo.setPosition(closeServoMeric);
-                } else {
-                    intakeServo.setPosition(releaseServoPos);
+            // This will change the mode if the bumper is held long enough
+            if (gamepad2.left_bumper) {
+                toggleCounter += 0.01;  // How long to hold down basically
+                if (toggleCounter >= 1) {
+                    servoModeMeric = !servoModeMeric;  //   <<<< change mode
+                    toggleCounter = 0;
                 }
             } else {
-                if (servoModeMeric) {
+                toggleCounter = 0;
+            }
+
+            // Intake controls for Meric's intake design
+            if (servoModeMeric) {
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+                // Toggle opening and closing
+                if (gamepad2.y && !changed4) {
+                    servoOpen = !servoOpen;
+                    changed4 = true;
+                } else if (!gamepad2.y){
+                    changed4 = false;
+                }
+                // Set servo pos
+                if (servoOpen) {
                     intakeServo.setPosition(openServoMeric);
+                } else {
+                    intakeServo.setPosition(closeServoMeric);
+                }
+            }
+
+            // Intake controls for original ratchet intake
+            else {
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
+                // Only release ratchet while y being pressed
+                if (gamepad2.y) {
+                    intakeServo.setPosition(releaseServoPos);
                 } else {
                     intakeServo.setPosition(lockServoPos);
                 }
@@ -228,47 +255,37 @@ public class LuckyTeleOp extends LinearOpMode{
             // ### SPEED CHANGE STUFFINGS ### \\
 
             // Speed change toggle
-            if(gamepad1.b && !changed3) {
-                if(powerLim == .5){
-                    powerLim = 0.75;
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+            if(gamepad1.b && !changed1) {
+                if(powerLim != 1){
+                    powerLim = 1;
+                    // lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
                 }
                 else{
-                    powerLim = .5;
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+                    powerLim = .75;
+                    // lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
                 }
-                changed3 = true;
-            } else if(!gamepad1.b){changed3 = false;}
+                changed1 = true;
+            } else if(!gamepad1.b){changed1 = false;}
 
             // Direction change toggle
-            if(gamepad1.a && !changed4) {
+            if(gamepad1.a && !changed2) {
                 moveDir *= -1;
-                if (moveDir < 0) {
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
-                }
-                changed4 = true;
-            } else if(!gamepad1.a){changed4 = false;}
+                changed2 = true;
+            } else if(!gamepad1.a){changed2 = false;}
 
 
             // ### LIFT CONTROLS ### \\
 
             //speed limiter toggle
-            if(gamepad2.b && !changed6) {
-                if(armPowerLim == .5){
+            if(gamepad2.b && !changed3) {
+                if(armPowerLim != 1){
                     armPowerLim = 1;
                 }
                 else{
-                    armPowerLim = .5;
+                    armPowerLim = .75;
                 }
-                changed6 = true;
-            } else if(!gamepad2.b){changed6 = false;}
-
-            // If the Magnetic Limit Switch is pressed, stop the motor
-            if (limitLeft.getState() || limitRight.getState()) {
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_2_COLOR_GRADIENT);
-            } else { // Otherwise, run the motor
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_LIGHT_CHASE);
-            }
+                changed3 = true;
+            } else if(!gamepad2.b){changed3 = false;}
 
             // This limits the distance the lift can travel
             if(liftLeft.getCurrentPosition() > 2800 || liftRight.getCurrentPosition() > 2800){
@@ -279,7 +296,6 @@ public class LuckyTeleOp extends LinearOpMode{
             } else{
                 powerLim = .75;
             }
-
 
             // ### COLOR STUFF ### \\
 
