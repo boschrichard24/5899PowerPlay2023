@@ -9,22 +9,25 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.AutoCode.NEWcamera;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
 
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
-import java.util.List;
-
-
-public abstract class AutoSupplies extends LinearOpMode{
+public abstract class NEWcamera extends LinearOpMode{
 
     //             < < < [ VARIABLES BEGIN HERE ] > > >             \\
     // Motors, servos, etc.
@@ -53,21 +56,14 @@ public abstract class AutoSupplies extends LinearOpMode{
     protected Orientation lastPitches = new Orientation();
 
 
-    /*
-    protected Rev2mDistanceSensor distanceFwdLeft = null;
-    protected Rev2mDistanceSensor distanceFwdRight = null;
-    protected Rev2mDistanceSensor distanceBackLeft = null;
-    protected Rev2mDistanceSensor distanceBackRight = null;
-    protected Rev2mDistanceSensor distanceLeftTop = null;
-    protected Rev2mDistanceSensor distanceLeftBottom = null;
-*/
-
     //Encoder Values
     //Neverest 40 motor spec: quadrature encoder, 7 pulses per revolution, count = 7 * 40
     private static final double COUNTS_PER_MOTOR_REV = 420; // Neverest 40 motor encoder - orginal val = 280
     private static final double DRIVE_GEAR_REDUCTION = 1; // This is < 1 if geared up
     private static final double COUNTS_PER_DEGREE1 = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / 360;
     //---callable methods---\\
+
+    public NEWcamera.SkystoneDeterminationPipeline pipeline;
 
     // Servo values \\
     double lockServoPos = 0.0;
@@ -76,40 +72,18 @@ public abstract class AutoSupplies extends LinearOpMode{
     double openServoMeric = 0.5;
     boolean servoModeMeric = false;
 
-    /*public void setup()
-    {
-        resetArmEncoders();
-    }*/
-
-    private static final double A_Left = 1;
-    private static final double A_Top = 1; //Fill in with legit values
-    private static final double A_Right = 320;
-    private static final double A_Bottom = 480;
-
-    private static final double B_Left = 321;
-    private static final double B_Top = 1; //Fill in with legit values
-    private static final double B_Right = 640;
-    private static final double B_Bottom = 480;
-
-    private static final double C_Left = 0;
-    private static final double C_Top = 0; //Fill in with legit values
-    private static final double C_Right = 0;
-    private static final double C_Bottom = 0;
 
 
-    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
 
     private static final String[] LABELS = {
-            "1 Bolt",
-            "2 Bulb",
-            "3 Panel"
+            "image1",
+            "image2",
+            "image3"
     };
 
     private static final String VUFORIA_KEY =
             "AcuKVGn/////AAABmYltM2e7pk7PgntBn1QBuWhrTu52XxsTTE0NUewmsJRB/KPGYohT+y+YHK8/LEcyIki6iW/Msvl8c4kwg5XFMGWY19pEmKxhqgtXd58d5Kyu+UC8NFYlEf52vluc0yibUUmianPhos+tutELIA2PqQqSgM3WTXxH+fwUdPIvAJuTHZqxu9t9cK3qKZeLzsgDSOXeKEjOcmkJQsFsneppUGPTrehHCDLRYyOAwDgHsr2X65ZhZ4cOSYoQR0WDo2ogRvFxuWDPinD9Gj8jq4AxNDrAr3kLkZwbtSc6IfD0dAysXtIoK41JgDZNK2BG93C9tDoNmNTUJNFv3pn6+cywIch5e1ylQ0ZBfZ47ZMCTDJA+";
-    private VuforiaLocalizer vuforia;
-    private TFObjectDetector tfod;
+
     // //             < < < [ FUNCTIONS BEGIN HERE ] > > >             \\ \\
 
     //move
@@ -249,9 +223,9 @@ public abstract class AutoSupplies extends LinearOpMode{
     {
         telemetry.addData("leftArm Encoder Val :: ",liftLeft.getCurrentPosition());
         telemetry.addData("rightArm Encoder Val :: ",liftRight.getCurrentPosition());
-        runArmPower(-0.8);
-        liftLeft.setTargetPosition(2989);
-        liftRight.setTargetPosition(2917);
+        runArmPower(-1);
+        liftLeft.setTargetPosition(2929);
+        liftRight.setTargetPosition(2838);
     }
 
     public void runArmPower(double power)
@@ -508,110 +482,8 @@ public abstract class AutoSupplies extends LinearOpMode{
 
         return globalPitch;
     }
-    /*
-    public double getDistanceFwdLeft(){
-        return distanceFwdLeft.getDistance(DistanceUnit.MM);
-    }
-    public double getDistanceFwdRight(){
-        return distanceFwdRight.getDistance(DistanceUnit.MM);
-    }
-    public double getDistanceBackLeft(){
-        return distanceBackRight.getDistance(DistanceUnit.MM);
-    }
-    public double getDistanceBackRight(){
-        return distanceBackRight.getDistance(DistanceUnit.MM);
-    }
-    public double getDistanceLeftTop(){ return distanceLeftTop.getDistance(DistanceUnit.MM); }
-    public double getDistanceLeftBottom(){ return distanceLeftBottom.getDistance(DistanceUnit.MM); }
-    public void moveUsingLeftDistance(double distance, double power){//- means strafe left and + means strafe right
-        while (opModeIsActive()) {
-            double dist = distanceLeftTop.getDistance(DistanceUnit.MM);
-            double dist2 = distanceLeftBottom.getDistance(DistanceUnit.MM);
-            //time out check
-            if(dist == 65535 || distanceLeftTop.didTimeoutOccur()) {
-                dist = 65535;
-            }
-            if(dist2 == 65535 || distanceLeftBottom.didTimeoutOccur()){
-                dist2 = 65535;
-            }
-            if(dist >= 8000 || dist2 >= 8000){
-                dist = 8190;
-                dist2 = 8190;
-            }
-            //telemetry
-            telemetry.addData("distance val 1", dist);
-            telemetry.addData("distance val 2", dist2);
-            //power set or loop break if distance traveled is met
-            if(power <= 0) {
-                if (dist != 65535 && dist2 != 65535 && (dist + dist2) / 2 > distance) {
-                    setPower(power, 0);
-                } else if (dist != 65535 && dist2 == 65535 && dist > distance) {
-                    setPower(power, 0);
-                } else if (dist == 65535 && dist2 != 65535 && dist2 > distance) {
-                    setPower(power, 0);
-                } else {
-                    break;
-                }
-            }
-            else {
-                if (dist != 65535 && dist2 != 65535 && (dist + dist2) / 2 < distance) {
-                    setPower(power, 0);
-                } else if (dist != 65535 && dist2 == 65535 && dist < distance) {
-                    setPower(power, 0);
-                } else if (dist == 65535 && dist2 != 65535 && dist2 < distance) {
-                    setPower(power, 0);
-                } else {
-                    break;
-                }
-            }
-            telemetry.update();
-        }
-    }
-    public void moveUsingFwdDistance(double distance, double power){//- means strafe back and + means strafe fwd
-        while (opModeIsActive()) {
-            double dist = distanceFwdLeft.getDistance(DistanceUnit.MM);
-            double dist2 = distanceFwdRight.getDistance(DistanceUnit.MM);
-            //time out check
-            if(dist == 65535 || distanceFwdLeft.didTimeoutOccur()) {
-                dist = 65535;
-            }
-            if(dist2 == 65535 || distanceFwdRight.didTimeoutOccur()){
-                dist2 = 65535;
-            }
-            if(dist >= 8190 || dist2 >= 8190){
-                dist = 8190;
-                dist2 = 8190;
-            }
-            //telemetry
-            telemetry.addData("distance val 1", dist);
-            telemetry.addData("distance val 2", dist2);
-            //power set or loop break if distance traveled is met
-            if(power <= 0) {
-                if (dist != 65535 && dist2 != 65535 && (dist + dist2) / 2 < distance) {
-                    setPower(0, power);
-                } else if (dist != 65535 && dist2 == 65535 && dist < distance) {
-                    setPower(0, power);
-                } else if (dist == 65535 && dist2 != 65535 && dist2 < distance) {
-                    setPower(0, power);
-                } else {
-                    break;
-                }
-            }
-            else {
-                if (dist != 65535 && dist2 != 65535 && (dist + dist2) / 2 > distance) {
-                    setPower(0, power);
-                } else if (dist != 65535 && dist2 == 65535 && dist > distance) {
-                    setPower(0, power);
-                } else if (dist == 65535 && dist2 != 65535 && dist2 > distance) {
-                    setPower(0, power);
-                } else {
-                    break;
-                }
-            }
-            telemetry.update();
-        }
-    }
-*/
+
+
     public void initForAutonomous()
     {
         //Prepares all the hardware
@@ -661,22 +533,8 @@ public abstract class AutoSupplies extends LinearOpMode{
         motorFwdRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorFwdLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//sensors
-        /*
-        distanceFwdLeft = hardwareMap.get(Rev2mDistanceSensor.class, "distanceFwdLeft");
-        distanceFwdRight = hardwareMap.get(Rev2mDistanceSensor.class, "distanceFwdRight");
-        distanceBackLeft = hardwareMap.get(Rev2mDistanceSensor.class, "distanceBackLeft");
-        distanceBackRight = hardwareMap.get(Rev2mDistanceSensor.class, "distanceBackRight");
-        distanceLeftTop = hardwareMap.get(Rev2mDistanceSensor.class, "distanceLeftTop");
-        distanceLeftBottom = hardwareMap.get(Rev2mDistanceSensor.class, "distanceLeftBottom");
-         */
 
         intakeServo.setPosition(lockServoPos);
-
-
-
-
-
 
         //resetArmEncoders();
 
@@ -687,9 +545,34 @@ public abstract class AutoSupplies extends LinearOpMode{
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(gyroParameters);
 
+        //setup Camera
+        final OpenCvCamera webcam;
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        pipeline = new NEWcamera.SkystoneDeterminationPipeline();
+        webcam.setPipeline(pipeline);
+
+        //--Setup Camera--
+        //webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                webcam.startStreaming(1184,656, OpenCvCameraRotation.UPRIGHT);//320x240, 1024x576, 1184x656 all work -- 1280x720 does not for some reason
+            }
+        });
+        double time1 = runtime.milliseconds();
+        double time2 = 0;
+        while(time2 < (time1 + 4000) && opModeIsActive()){//intended to ensure that the camera works but does not function
+            time2 = runtime.milliseconds();
+        }
         telemetry.clear();
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+
+
     }
 
     public void test()
@@ -697,191 +580,109 @@ public abstract class AutoSupplies extends LinearOpMode{
         //telemetry.update();
     }
 
-    private void initVuforia() {
+    public static class SkystoneDeterminationPipeline extends OpenCvPipeline
+    {
         /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         * An enum to define the skystone position
          */
-        telemetry.addData("InitVIEW here", "AHHHHHHH");
-        telemetry.update();
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-        telemetry.addData("InitVIEW here", "AHHHHHH init-ed");
-        telemetry.update();
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
-        telemetry.addData("InitVIEW here", "AH Config-ed");
-        telemetry.update();
-        telemetry.addData("Param test here", parameters);
-        telemetry.update();
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-        telemetry.addData("InitVIEW here", "AH class time");
-        telemetry.update();
-        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
-    }
+        public enum RingPosition
+        {
+            FOUR,
+            ONE,
+            NONE
+        }
 
+        /*
+         * Some color constants
+         */
+        static final Scalar BLUE = new Scalar(0, 0, 255);
+        static final Scalar GREEN = new Scalar(0, 255, 0);
 
-    private void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.8f;
-        tfodParameters.isModelTensorFlow2 = true;
-        tfodParameters.inputSize = 320;
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-    }
+        /*
+         * The core values which define the location and size of the sample regions
+         */
+        static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(592,430);
 
-    public void initVision(){
-        telemetry.addData("InitVision here", "HUUZZZUH");
-        telemetry.update();
-        initVuforia();
-        initTfod();
-        telemetry.addData("InitVision here", "HUUZZZUH part 2");
-        telemetry.update();
-        if (tfod != null) {
-            tfod.activate();
-            tfod.setZoom(1, 16.0/9.0);
+        static final int REGION_WIDTH = 105;
+        static final int REGION_HEIGHT = 150;
+
+        final int FOUR_RING_THRESHOLD = 150;
+        final int ONE_RING_THRESHOLD = 135;
+
+        Point region1_pointA = new Point(
+                REGION1_TOPLEFT_ANCHOR_POINT.x,
+                REGION1_TOPLEFT_ANCHOR_POINT.y);
+        Point region1_pointB = new Point(
+                REGION1_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
+                REGION1_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
+
+        /*
+         * Working variables
+         */
+        Mat region1_Cb;
+        Mat YCrCb = new Mat();
+        Mat Cb = new Mat();
+        int avg1;
+
+        // Volatile since accessed by OpMode thread w/o synchronization
+        public volatile NEWcamera.SkystoneDeterminationPipeline.RingPosition position = NEWcamera.SkystoneDeterminationPipeline.RingPosition.FOUR;
+
+        /*
+         * This function takes the RGB frame, converts to YCrCb,
+         * and extracts the Cb channel to the 'Cb' variable
+         */
+        void inputToCb(Mat input)
+        {
+            Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
+            Core.extractChannel(YCrCb, Cb, 1);
+        }
+
+        @Override
+        public void init(Mat firstFrame)
+        {
+            inputToCb(firstFrame);
+
+            region1_Cb = Cb.submat(new Rect(region1_pointA, region1_pointB));
+        }
+
+        @Override
+        public Mat processFrame(Mat input)
+        {
+            inputToCb(input);
+
+            avg1 = (int) Core.mean(region1_Cb).val[0];
+
+            Imgproc.rectangle(
+                    input, // Buffer to draw on
+                    region1_pointA, // First point which defines the rectangle
+                    region1_pointB, // Second point which defines the rectangle
+                    BLUE, // The color the rectangle is drawn in
+                    2); // Thickness of the rectangle lines
+
+            position = NEWcamera.SkystoneDeterminationPipeline.RingPosition.FOUR; // Record our analysis
+            if(avg1 > FOUR_RING_THRESHOLD){
+                position = NEWcamera.SkystoneDeterminationPipeline.RingPosition.FOUR;
+            }else if (avg1 > ONE_RING_THRESHOLD){
+                position = NEWcamera.SkystoneDeterminationPipeline.RingPosition.ONE;
+            }else{
+                position = NEWcamera.SkystoneDeterminationPipeline.RingPosition.NONE;
+            }
+
+            Imgproc.rectangle(
+                    input, // Buffer to draw on
+                    region1_pointA, // First point which defines the rectangle
+                    region1_pointB, // Second point which defines the rectangle
+                    GREEN, // The color the rectangle is drawn in
+                    -1); // Negative thickness means solid fill
+
+            return input;
+        }
+
+        public int getAnalysis()
+        {
+            return avg1;
         }
     }
 
-    public Recognition getConeType(){
-        int i = 0;
-        if (tfod != null) {
-            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-            if (updatedRecognitions != null) {
-                for (Recognition recognition : updatedRecognitions) {
-                    if(recognition.getLabel() == LABELS[i] && i < 3) {
-                        return recognition;
-                    }
-                    i++;
-                    telemetry.addData("I - Val", i);
-                }
-                //telemetry.update();
-            }
-        }
-        return null;
-    }
 
-    public int getZone(Recognition cone){
-        if(cone == null){
-            telemetry.addData("I AM ZOOOONNNNNNEEEEEE", 12);
-            return 12345;
-        }
-        if(cone.getLabel().equals("1 Bolt")){
-            return 1;
-        }
-        else if(cone.getLabel().equals("2 Bulb")){
-            return 2;
-        }
-        else if(cone.getLabel().equals("3 Panel")){
-            return 3;
-        } else{ return -1; }
-    }
-
-    // //             < < < [ DIST SENSOR CODE BEGIN HERE ] > > >             \\ \\
-
-    /*
-    public double getDistanceFwdLeft(){
-        return distanceFwdLeft.getDistance(DistanceUnit.MM);
-    }
-    public double getDistanceFwdRight(){
-        return distanceFwdRight.getDistance(DistanceUnit.MM);
-    }
-    public double getDistanceBackLeft(){
-        return distanceBackRight.getDistance(DistanceUnit.MM);
-    }
-    public double getDistanceBackRight(){
-        return distanceBackRight.getDistance(DistanceUnit.MM);
-    }
-    public double getDistanceLeftTop(){ return distanceLeftTop.getDistance(DistanceUnit.MM); }
-    public double getDistanceLeftBottom(){ return distanceLeftBottom.getDistance(DistanceUnit.MM); }
-    public void moveUsingLeftDistance(double distance, double power){//- means strafe left and + means strafe right
-        while (opModeIsActive()) {
-            double dist = distanceLeftTop.getDistance(DistanceUnit.MM);
-            double dist2 = distanceLeftBottom.getDistance(DistanceUnit.MM);
-            //time out check
-            if(dist == 65535 || distanceLeftTop.didTimeoutOccur()) {
-                dist = 65535;
-            }
-            if(dist2 == 65535 || distanceLeftBottom.didTimeoutOccur()){
-                dist2 = 65535;
-            }
-            if(dist >= 8000 || dist2 >= 8000){
-                dist = 8190;
-                dist2 = 8190;
-            }
-            //telemetry
-            telemetry.addData("distance val 1", dist);
-            telemetry.addData("distance val 2", dist2);
-            //power set or loop break if distance traveled is met
-            if(power <= 0) {
-                if (dist != 65535 && dist2 != 65535 && (dist + dist2) / 2 > distance) {
-                    setPower(power, 0);
-                } else if (dist != 65535 && dist2 == 65535 && dist > distance) {
-                    setPower(power, 0);
-                } else if (dist == 65535 && dist2 != 65535 && dist2 > distance) {
-                    setPower(power, 0);
-                } else {
-                    break;
-                }
-            }
-            else {
-                if (dist != 65535 && dist2 != 65535 && (dist + dist2) / 2 < distance) {
-                    setPower(power, 0);
-                } else if (dist != 65535 && dist2 == 65535 && dist < distance) {
-                    setPower(power, 0);
-                } else if (dist == 65535 && dist2 != 65535 && dist2 < distance) {
-                    setPower(power, 0);
-                } else {
-                    break;
-                }
-            }
-            telemetry.update();
-        }
-    }
-    public void moveUsingFwdDistance(double distance, double power){//- means strafe back and + means strafe fwd
-        while (opModeIsActive()) {
-            double dist = distanceFwdLeft.getDistance(DistanceUnit.MM);
-            double dist2 = distanceFwdRight.getDistance(DistanceUnit.MM);
-            //time out check
-            if(dist == 65535 || distanceFwdLeft.didTimeoutOccur()) {
-                dist = 65535;
-            }
-            if(dist2 == 65535 || distanceFwdRight.didTimeoutOccur()){
-                dist2 = 65535;
-            }
-            if(dist >= 8190 || dist2 >= 8190){
-                dist = 8190;
-                dist2 = 8190;
-            }
-            //telemetry
-            telemetry.addData("distance val 1", dist);
-            telemetry.addData("distance val 2", dist2);
-            //power set or loop break if distance traveled is met
-            if(power <= 0) {
-                if (dist != 65535 && dist2 != 65535 && (dist + dist2) / 2 < distance) {
-                    setPower(0, power);
-                } else if (dist != 65535 && dist2 == 65535 && dist < distance) {
-                    setPower(0, power);
-                } else if (dist == 65535 && dist2 != 65535 && dist2 < distance) {
-                    setPower(0, power);
-                } else {
-                    break;
-                }
-            }
-            else {
-                if (dist != 65535 && dist2 != 65535 && (dist + dist2) / 2 > distance) {
-                    setPower(0, power);
-                } else if (dist != 65535 && dist2 == 65535 && dist > distance) {
-                    setPower(0, power);
-                } else if (dist == 65535 && dist2 != 65535 && dist2 > distance) {
-                    setPower(0, power);
-                } else {
-                    break;
-                }
-            }
-            telemetry.update();
-        }
-    }
-*/
 }

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 //opencv imports
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+
 
 //webcam imports
 
