@@ -40,10 +40,6 @@ public class LuckyTeleOp extends LinearOpMode{
     private DistanceSensor coneProx;
     private ColorSensor colorBoi;
 
-    private DigitalChannel limitLeft;
-    private DigitalChannel limitRight;
-
-
     private final ElapsedTime runtime = new ElapsedTime();
 
     //Encoder Values
@@ -52,8 +48,10 @@ public class LuckyTeleOp extends LinearOpMode{
     private static final double DRIVE_GEAR_REDUCTION1 = .5; // This is < 1.0 if geared UP
     private static final double COUNTS_PER_DEGREE1 = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION1) / 360;
 
+    private static final double MAX_DRIVE_POWER = .8;  // 80% power
+
     double maxPower;
-    double powerLim = 0.75;
+    double powerLim = MAX_DRIVE_POWER;  // This changes throughout the code btw
     double moveDir = 1;
     double armPowerLim = 1;
     Orientation angles;
@@ -61,11 +59,6 @@ public class LuckyTeleOp extends LinearOpMode{
     // Servo values \\
     double lockServoPos = 0.0;
     double releaseServoPos = 0.4;
-    double closeServoMeric = 0.05;
-    double openServoMeric = 0.5;
-    boolean servoModeMeric = false;
-    boolean servoOpen = false;  // Only used with Meric's intake (toggle controls)
-    double toggleCounter = 0.0;
 
     double color1 = 0;
     double blue = 0;
@@ -106,11 +99,9 @@ public class LuckyTeleOp extends LinearOpMode{
         liftRight = hardwareMap.get(DcMotor.class, "liftRight");
         liftRight.setDirection(DcMotor.Direction.FORWARD);
 
-        // Sensors on face of robot beneath intake
+        // Sensors on face of robot beneath intake (only used in telemetry rn)
         coneProx = hardwareMap.get(DistanceSensor.class, "coneProx");
         colorBoi = hardwareMap.get(ColorSensor.class, "colorBoi");
-        limitLeft = hardwareMap.get(DigitalChannel.class, "limitLeft");
-        limitRight = hardwareMap.get(DigitalChannel.class, "limitRight");
 
         resetLiftEncoders();
 
@@ -134,7 +125,6 @@ public class LuckyTeleOp extends LinearOpMode{
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
     }
 
     @SuppressLint("DefaultLocale")
@@ -143,20 +133,11 @@ public class LuckyTeleOp extends LinearOpMode{
 
         hardwareSetup();
 
-        // Variables
+        // Used for toggles
         boolean changed1 = false;
         boolean changed2 = false;
-        boolean changed3 = false;
-        boolean changed4 = false;
 
-        // Starting pos
-        if (servoModeMeric) {
-            intakeServo.setPosition(openServoMeric);
-            servoOpen = true;
-        } else {
-            intakeServo.setPosition(lockServoPos);
-            servoOpen = false;
-        }
+        intakeServo.setPosition(lockServoPos);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -199,102 +180,52 @@ public class LuckyTeleOp extends LinearOpMode{
             }
 
             // Setting movement for lift and drive motors
-            double max = 1.0;
-            motorFwdLeft.setPower(leftFrontPower* max);
-            motorFwdRight.setPower(rightFrontPower* max);
-            motorBackLeft.setPower(leftBackPower* max);
-            motorBackRight.setPower(rightBackPower* max);
+            motorFwdLeft.setPower(leftFrontPower);
+            motorFwdRight.setPower(rightFrontPower);
+            motorBackLeft.setPower(leftBackPower);
+            motorBackRight.setPower(rightBackPower);
 
             liftLeft.setPower(liftPower);
             liftRight.setPower(liftPower);
 
-
             // ### INTAKE SERVO CODE ### \\
 
-            // This will change the mode if the bumper is held long enough
-            if (gamepad2.left_bumper) {
-                toggleCounter += 0.01;  // How long to hold down basically
-                if (toggleCounter >= 1) {
-                    servoModeMeric = !servoModeMeric;  //   <<<< change mode
-                    toggleCounter = 0;
-                }
+            // Only release ratchet while 'y' being pressed
+            if (gamepad2.y) {
+                intakeServo.setPosition(releaseServoPos);
             } else {
-                toggleCounter = 0;
+                intakeServo.setPosition(lockServoPos);
             }
 
-            // Intake controls for Meric's intake design
-            if (servoModeMeric) {
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-                // Toggle opening and closing
-                if (gamepad2.y && !changed4) {
-                    servoOpen = !servoOpen;
-                    changed4 = true;
-                } else if (!gamepad2.y){
-                    changed4 = false;
-                }
-                // Set servo pos
-                if (servoOpen) {
-                    intakeServo.setPosition(openServoMeric);
-                } else {
-                    intakeServo.setPosition(closeServoMeric);
-                }
-            }
-
-            // Intake controls for original ratchet intake
-            else {
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
-                // Only release ratchet while y being pressed
-                if (gamepad2.y) {
-                    intakeServo.setPosition(releaseServoPos);
-                } else {
-                    intakeServo.setPosition(lockServoPos);
-                }
-            }
-
-
-            // ### SPEED CHANGE STUFFINGS ### \\
-
-            // Speed change toggle
-            if(gamepad1.b && !changed1) {
-                if(powerLim != 1){
-                    powerLim = 1;
-                    // lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-                }
-                else{
-                    powerLim = .75;
-                    // lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-                }
-                changed1 = true;
-            } else if(!gamepad1.b){changed1 = false;}
+            // ### SPEED CHANGE ### \\
 
             // Direction change toggle
-            if(gamepad1.a && !changed2) {
+            if(gamepad1.a && !changed1) {
                 moveDir *= -1;
-                changed2 = true;
-            } else if(!gamepad1.a){changed2 = false;}
-
+                changed1 = true;
+            } else if(!gamepad1.a){changed1 = false;}
 
             // ### LIFT CONTROLS ### \\
 
             //speed limiter toggle
-            if(gamepad2.b && !changed3) {
+            if(gamepad2.b && !changed2) {
                 if(armPowerLim != 1){
                     armPowerLim = 1;
                 }
                 else{
-                    armPowerLim = .75;
+                    armPowerLim = .6;  // 60% is pretty nice when placing cones (50% is too little)
                 }
-                changed3 = true;
-            } else if(!gamepad2.b){changed3 = false;}
+                changed2 = true;
+            } else if(!gamepad2.b){changed2 = false;}
 
-            // This limits the distance the lift can travel
+            // This decreases the drive speed when the lift is really high up
             if(liftLeft.getCurrentPosition() > 2800 || liftRight.getCurrentPosition() > 2800){
-                powerLim = 0.25;
+                powerLim = 0.4;
             }
             else if(liftLeft.getCurrentPosition() > 1650 || liftRight.getCurrentPosition() > 1650){
                 powerLim = .5;
             } else{
-                powerLim = .75;
+                powerLim = MAX_DRIVE_POWER;
             }
 
             // ### COLOR STUFF ### \\
@@ -304,11 +235,9 @@ public class LuckyTeleOp extends LinearOpMode{
             green = colorBoi.green();
             blue = colorBoi.blue();
 
-
             // ### TELEMETRY STUFF (wait really?!) ### \\
 
-            telemetry.addData("Wheel Position", motorFwdLeft.getCurrentPosition()); //to be used when the encoders are ready
-            telemetry.addData("Max Speed",powerLim);
+            telemetry.addData("Drive Speed Limiter",powerLim);
             telemetry.addData("Direction",moveDir);
             telemetry.addData("leftFrontPower :: ",leftFrontPower);
             telemetry.addData("rightFrontPower :: ",rightFrontPower);
@@ -319,10 +248,10 @@ public class LuckyTeleOp extends LinearOpMode{
             telemetry.addData("IMU YAW :: ", imu.getAngularOrientation());
             telemetry.addData("Angle Val :: ", angles);
             telemetry.addData("range", String.format("%.01f cm", coneProx.getDistance(DistanceUnit.CM)));
-            telemetry.addData("Alpha", color1);
-            telemetry.addData("Red", red);
-            telemetry.addData("Green", green);
-            telemetry.addData("Blue", blue);
+            //telemetry.addData("Alpha", color1);
+            //telemetry.addData("Red", red);
+            //telemetry.addData("Green", green);
+            //telemetry.addData("Blue", blue);
 
             telemetry.update();
         }
