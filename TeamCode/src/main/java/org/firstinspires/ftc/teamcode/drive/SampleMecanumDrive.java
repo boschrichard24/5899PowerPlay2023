@@ -65,7 +65,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     //public static PIDCoefficients HEADING_PID = new PIDCoefficients(0.2, 0, 0);
     /*DriveTrain*/ public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0);
 
-    public static double LATERAL_MULTIPLIER = 0.87039106145251;
+    public static double LATERAL_MULTIPLIER = 0.95032177152932;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -111,6 +111,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private Pose2d lastPoseOnTurn;
 
+
     public SampleMecanumDrive(HardwareMap hardwareMap, boolean... odametry) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
@@ -144,7 +145,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
-/*
+
         // TODO: adjust the names of the following hardware devices to match your configuration
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -154,7 +155,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         // TODO: if your hub is mounted vertically, remap the IMU axes so that the z-axis points
         // upward (normal to the floor) using a command like the following:
         BNO055IMUUtil.remapAxes(imu, AxesOrder.ZXY, AxesSigns.PPP);
-*/
+
         motorFwdLeft = hardwareMap.get(DcMotorEx.class, "motorFwdLeft");
         motorBackLeft = hardwareMap.get(DcMotorEx.class, "motorBackLeft");
         motorFwdRight = hardwareMap.get(DcMotorEx.class, "motorFwdRight");

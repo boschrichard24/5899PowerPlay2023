@@ -97,13 +97,13 @@ public abstract class AutoSupplies extends LinearOpMode{
     private static final double C_Bottom = 0;
 
 
-    private static final String TFOD_MODEL_ASSET = "PowerPlayV2.tflite";
+    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
     private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
 
     private static final String[] LABELS = {
-            "image1",
-            "image2",
-            "image3"
+            "1 Bolt",
+            "2 Bulb",
+            "3 Panel"
     };
 
     private static final String VUFORIA_KEY =

@@ -38,7 +38,6 @@ public class LuckyTeleOp extends LinearOpMode{
     protected RevBlinkinLedDriver lights;
 
     private DistanceSensor coneProx;
-    private ColorSensor colorBoi;
 
     private final ElapsedTime runtime = new ElapsedTime();
 
@@ -101,7 +100,6 @@ public class LuckyTeleOp extends LinearOpMode{
 
         // Sensors on face of robot beneath intake (only used in telemetry rn)
         coneProx = hardwareMap.get(DistanceSensor.class, "coneProx");
-        colorBoi = hardwareMap.get(ColorSensor.class, "colorBoi");
 
         resetLiftEncoders();
 
@@ -230,10 +228,6 @@ public class LuckyTeleOp extends LinearOpMode{
 
             // ### COLOR STUFF ### \\
 
-            color1 = colorBoi.alpha();
-            red = colorBoi.red();
-            green = colorBoi.green();
-            blue = colorBoi.blue();
 
             // ### TELEMETRY STUFF (wait really?!) ### \\
 
